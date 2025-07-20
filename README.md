@@ -19,7 +19,7 @@ A lightweight notes application for Pop!_OS Cosmic desktop built with Rust and G
 ### Quick Install
 ```bash
 curl -sSL https://raw.githubusercontent.com/Sadsfan/cosmic-notes/main/install.sh | bash
-```markdown
+
 ## Usage
 
 - Launch from applications menu or run `cosmic-notes-applet`
