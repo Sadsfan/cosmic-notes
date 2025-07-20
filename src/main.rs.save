@@ -1,0 +1,127 @@
+
+            }
+        }
+    };
+
+    let load_current_note = {
+        let notes = notes.clone();
+        let current_note = current_note.clone();
+        let text_view = text_view.clone();
+        
+        move || {
+            let notes_ref = notes.borrow();
+            let current_index = *current_note.borrow();
+            
+            if let Some(note) = notes_ref.get(current_index) {
+                let buffer = text_view.buffer();
+                buffer.set_text(&note.content);
+            }
+        }
+    };
+
+    let save_current_note = {
+        let notes = notes.clone();
+        let current_note = current_note.clone();
+        let text_view = text_view.clone();
+        
+        move || {
+            let buffer = text_view.buffer();
+            let start = buffer.start_iter();
+            let end = buffer.end_iter();
+            let content = buffer.text(&start, &end, false);
+
+            let current_index = *current_note.borrow();
+            let mut notes_ref = notes.borrow_mut();
+            
+            if let Some(note) = notes_ref.get_mut(current_index) {
+                note.content = content.to_string();
+                
+                // Update title from first line
+                let title = content
+                    .lines()
+                    .next()
+                    .unwrap_or("Untitled")
+                    .trim()
+                    .chars()
+                    .take(40)
+                    .collect::<String>();
+                note.title = if title.is_empty() {
+                    "Untitled".to_string()
+                } else {
+                    title
+                };
+                
+                note.timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M").to_string();
+            }
+        }
+    };
+
+    // Load initial data
+    refresh_notes_list();
+    load_current_note();
+
+    // Connect signals
+    
+    // New note button
+    {
+        let notes = notes.clone();
+        let current_note = current_note.clone();
+        let refresh_notes_list = refresh_notes_list.clone();
+        let load_current_note = load_current_note.clone();
+        let text_view = text_view.clone();
+        
+        new_note_button.connect_clicked(move |_| {
+            let new_note = Note {
+                title: "New Note".to_string(),
+                content: "".to_string(),
+                timestamp: chrono::Local::now().format("%Y-%m-%d %H:%M").to_string(),
+            };
+            
+            notes.borrow_mut().push(new_note);
+            let new_index = notes.borrow().len() - 1;
+            *current_note.borrow_mut() = new_index;
+            
+            refresh_notes_list();
+            load_current_note();
+            text_view.grab_focus();
+        });
+    }
+
+    // Save button
+    {
+        let save_current_note = save_current_note.clone();
+        let refresh_notes_list = refresh_notes_list.clone();
+        
+        save_button.connect_clicked(move |_| {
+            save_current_note();
+            refresh_notes_list();
+        });
+    }
+
+    // Close button
+    {
+        let window = window.clone();
+        close_button.connect_clicked(move |_| {
+            window.close();
+        });
+    }
+
+    // Notes list selection - simplified to avoid borrowing issues
+    {
+        let notes = notes.clone();
+        let current_note = current_note.clone();
+        let load_current_note = load_current_note.clone();
+        
+        notes_list.connect_row_selected(move |_, row| {
+            if let Some(row) = row {
+                let index = row.index() as usize;
+                if index < notes.borrow().len() {
+                    *current_note.borrow_mut() = index;
+                    load_current_note();
+                }
+            }
+        });
+    }
+
+    window.present();
+}

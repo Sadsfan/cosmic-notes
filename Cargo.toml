@@ -1,0 +1,18 @@
+[package]
+name = "cosmic-notes-applet"
+version = "0.1.0"
+edition = "2021"
+description = "A simple notes applet for Pop!_OS Cosmic desktop"
+license = "MIT"
+
+[dependencies]
+gtk4 = "0.7"
+adw = { version = "0.5", package = "libadwaita" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "5.0"
+
+[[bin]]
+name = "cosmic-notes-applet"
+path = "src/main.rs"
