@@ -18,15 +18,3 @@ A lightweight notes application for Pop!_OS Cosmic desktop built with Rust and G
 ### Quick Install
 ```bash
 curl -sSL https://raw.githubusercontent.com/Sadsfan/cosmic-notes/main/install.sh | bash
-
-## Usage
-Launch from applications menu or run cosmic-notes-applet
-Click "+ New" to create notes
-Click 🗑️ to delete notes
-Notes auto-save when switching
-Notes stored in ~/.config/cosmic-notes/notes.json
-
-License
-MIT License
-
-Made with ❤️ for the Pop!_OS Cosmic community
